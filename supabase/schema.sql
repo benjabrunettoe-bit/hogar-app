@@ -75,6 +75,21 @@ alter table categories enable row level security;
 alter table transactions enable row level security;
 alter table fixed_items enable row level security;
 
+-- ============================================================
+-- PERMISOS DE TABLA (GRANTS) para los roles de la Data API
+-- Necesario cuando el proyecto se crea con "Automatically expose new
+-- tables" DESACTIVADO: las políticas RLS por sí solas no alcanzan, el
+-- rol también necesita el privilegio de tabla. Es seguro: RLS sigue
+-- filtrando las filas. NO se otorga TRUNCATE (que evitaría RLS).
+-- ============================================================
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on all tables in schema public to anon, authenticated;
+grant usage, select on all sequences in schema public to anon, authenticated;
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to anon, authenticated;
+alter default privileges in schema public
+  grant usage, select on sequences to anon, authenticated;
+
 -- función helper: hogar del usuario logueado
 create or replace function auth_household_id()
 returns uuid
